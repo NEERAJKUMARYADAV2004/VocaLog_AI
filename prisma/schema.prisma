@@ -1,0 +1,35 @@
+// 1. Tell Prisma what to generate
+generator client {
+  provider = "prisma-client"
+}
+
+// 2. Tell Prisma we are using PostgreSQL
+datasource db {
+  provider = "postgresql"
+}
+
+// 3. User Model for Admin
+model User {
+  id            String       @id @default(cuid())
+  username      String       @unique
+  password      String
+  sessions      Session[]    
+  transcripts   Transcript[]
+}
+
+// 4. Session Model (Required by Better Auth)
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 5. Transcript Model (Core Requirement)
+model Transcript {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
