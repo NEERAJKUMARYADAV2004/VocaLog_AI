@@ -1,11 +1,13 @@
 // 1. Tell Prisma what to generate
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
+  
 }
 
 // 2. Tell Prisma we are using PostgreSQL
 datasource db {
   provider = "postgresql"
+
 }
 
 // 3. User Model for Admin
