@@ -1,12 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // This ignores the "PrismaClient" error so you can deploy tonight!
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // Remove the eslint block entirely for now
 };
 
 export default nextConfig;
