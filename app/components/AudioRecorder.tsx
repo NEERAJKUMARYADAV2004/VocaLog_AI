@@ -1,20 +1,24 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { transcribeAudio } from "../actions/transcribe";
+// 1. Point this to the action we just fixed with Gemini 3
+import { processAudioUpload } from "@/app/actions/transcript-actions"; 
 
-export default function AudioRecorder() {
+interface Props {
+  isProcessing: boolean;
+  setIsProcessing: (val: boolean) => void;
+}
+
+export default function AudioRecorder({ isProcessing, setIsProcessing }: Props) {
   const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");
-  // 1. Add a state to handle our custom error messages
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   const startRecording = async () => {
-    setErrorMessage(null); // Clear any old errors when we start
+    setErrorMessage(null);
     setTranscript("");
 
     try {
@@ -30,22 +34,23 @@ export default function AudioRecorder() {
       };
 
       mediaRecorder.onstop = async () => {
-        setIsProcessing(true);
+        setIsProcessing(true); // Locks the whole UI
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const file = new File([audioBlob], "recording.webm", { type: "audio/webm" });
 
         const formData = new FormData();
-        formData.append("audio", file);
+        // 2. Changed "audio" to "file" to match your server-side .get("file")
+        formData.append("file", file); 
 
-        const response = await transcribeAudio(formData);
+        const response = await processAudioUpload(formData);
         
-        if (response.success && response.text) {
-          setTranscript(response.text);
+        if (response.success) {
+          // The log will now appear in your "Recent Logs" list automatically!
+          setTranscript("Voice log saved to dashboard.");
         } else {
-          // 2. Set the custom error instead of using window.alert()
           setErrorMessage(response.error || "The AI failed to process the audio.");
         }
-        setIsProcessing(false);
+        setIsProcessing(false); // Unlocks the UI
       };
 
       mediaRecorder.start();
@@ -88,32 +93,24 @@ export default function AudioRecorder() {
           "⏳ Transcribing..."
         ) : (
           <>
-            {/* LUXURY LINE ART SVG ICON */}
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80">
-              <path d="M2 10v3"/>
-              <path d="M6 6v11"/>
-              <path d="M10 3v18"/>
-              <path d="M14 8v7"/>
-              <path d="M18 5v13"/>
-              <path d="M22 10v3"/>
+              <path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/>
             </svg>
             Start Recording
           </>
         )}
       </button>
 
-      {/* LUXURY ERROR UI: Glassmorphism Alert */}
       {errorMessage && (
         <div className="mt-4 p-4 w-full bg-red-500/10 border border-red-500/20 rounded-lg backdrop-blur-md animate-in fade-in slide-in-from-top-2">
           <p className="text-red-400 text-sm font-medium text-center">{errorMessage}</p>
         </div>
       )}
 
-      {/* SUCCESS UI */}
-      {transcript && (
+      {transcript && !errorMessage && (
         <div className="mt-4 p-5 w-full bg-black/40 border border-white/5 rounded-lg text-gray-200 text-sm shadow-inner">
-          <p className="text-gray-400 mb-2 text-xs uppercase tracking-wider font-semibold">AI Transcription:</p>
-          <p className="leading-relaxed">{transcript}</p>
+          <p className="text-green-400/80 mb-2 text-xs uppercase tracking-wider font-semibold">Success:</p>
+          <p className="leading-relaxed italic">{transcript}</p>
         </div>
       )}
     </div>

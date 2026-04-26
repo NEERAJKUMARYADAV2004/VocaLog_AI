@@ -1,11 +1,29 @@
 import { prisma } from "../../lib/prisma"; 
-import AudioRecorder from "../components/AudioRecorder"; 
 import LogoutButton from "../components/LogoutButton";
+
+// Import the security tools
+import { auth } from "@/lib/auth"; 
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import TranscriptCard from "../components/TranscriptCard";
+
+import TranscriptionManager from "../components/TranscriptionManager"; // 
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  // Fetch newest logs at the top
+  // 1. THE GATEKEEPER: Check for the active session cookie
+  const session = await auth.api.getSession({
+    headers: await headers(), 
+  });
+
+  // 2. THE BOUNCER: If there is no session, instantly kick them to login
+  if (!session) {
+    redirect("/login");
+  }
+
+  // 3. THE REWARD: Only fetch the logs if they passed the security check
   const logs = await prisma.transcript.findMany({
     orderBy: { createdAt: "desc" }, 
   });
@@ -23,7 +41,7 @@ export default async function DashboardPage() {
         </header>
 
         <section className="w-full">
-          <AudioRecorder />
+         <TranscriptionManager />
         </section>
 
         {/* LOGOUT ANCHOR */}
@@ -45,22 +63,7 @@ export default async function DashboardPage() {
           ) : (
             <div className="flex flex-col gap-4">
               {logs.map((log) => (
-                <div 
-                  key={log.id} 
-                  className="p-7 bg-[#141414] border border-white/5 rounded-2xl shadow-xl hover:bg-[#181818] hover:border-white/10 transition-all duration-500 group"
-                >
-                  <p className="text-[#E0E0E0] leading-relaxed text-[17px] font-light tracking-wide">
-                    {log.content}
-                  </p>
-                  
-                  {/* Elegant timestamp footer */}
-                  <div className="flex items-center gap-3 mt-5 opacity-40 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="h-1 w-1 rounded-full bg-[#D4AF37]"></div>
-                    <p className="text-[11px] text-gray-400 font-mono tracking-widest uppercase">
-                      Logged: {new Date(log.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
+                <TranscriptCard key={log.id} log={log} />
               ))}
             </div>
           )}

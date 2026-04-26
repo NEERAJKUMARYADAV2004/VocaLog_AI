@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // In Next.js 16, you can just set the whole object to false!
-  devIndicators: false, 
+  devIndicators: false, // Keeping your UI clean!
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb', // 👈 This fixes the "Failed to fetch" error
+    },
+  },
 };
 
 export default nextConfig;
