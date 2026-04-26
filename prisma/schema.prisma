@@ -7,23 +7,35 @@ generator client {
 // 2. Tell Prisma we are using PostgreSQL
 datasource db {
   provider = "postgresql"
-
 }
 
 // 3. User Model for Admin
 model User {
-  id            String       @id @default(cuid())
-  username      String       @unique
-  password      String
-  sessions      Session[]    
-  transcripts   Transcript[]
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  username      String?   @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  password      String?   
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  sessions      Session[]
+  accounts      Account[]    // 👈 ADD THIS LINE
+  transcripts   Transcript[] // Keep your custom logs!
 }
 
 // 4. Session Model (Required by Better Auth)
 model Session {
   id        String   @id @default(cuid())
-  userId    String
   expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -34,4 +46,37 @@ model Transcript {
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+}
+
+// 6. Voice Logs
+model VoiceLog {
+  id        String   @id @default(cuid())
+  text      String   // This will hold the Gemini transcription
+  createdAt DateTime @default(now())
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
