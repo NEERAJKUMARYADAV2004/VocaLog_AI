@@ -2,6 +2,8 @@ import { prisma } from "../../lib/prisma";
 import AudioRecorder from "../components/AudioRecorder"; 
 import LogoutButton from "../components/LogoutButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   // Fetch newest logs at the top
   const logs = await prisma.transcript.findMany({
