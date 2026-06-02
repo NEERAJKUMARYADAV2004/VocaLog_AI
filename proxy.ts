@@ -25,6 +25,10 @@ export async function proxy(request: NextRequest) {
         const isAuthenticated = !!session;
 
         if (isAuthRoute && isAuthenticated) {
+<<<<<<< HEAD:proxy.ts
+=======
+            // Check to ensure we aren't already going to /dashboard to prevent loop
+>>>>>>> 4f6caf17d35ed31018a86e870929a93ebc1ef6cf:middleware.ts
             if ((pathname as string) !== "/dashboard") {
                 return NextResponse.redirect(new URL("/dashboard", request.url));
             }
