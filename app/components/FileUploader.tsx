@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { processAudioUpload } from "@/app/actions/transcript-actions";
-import Toast from "./Toast"; // 👈 Import the custom toast
+import Toast from "./Toast"; 
 
 interface Props {
     isProcessing: boolean;

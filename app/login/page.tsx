@@ -19,7 +19,7 @@ export default function LoginPage() {
         const { error } = await authClient.signIn.email({
             email: email,
             password: password,
-            callbackURL: "/dashboard" // Redirect after success
+            callbackURL: "/dashboard" 
         });
         
         if (error) {

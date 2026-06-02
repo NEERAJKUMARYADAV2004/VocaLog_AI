@@ -3,12 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { auth } from "@/lib/auth"; //  Added
+import { auth } from "@/lib/auth"; 
 import { headers } from "next/headers";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-// 1. DELETE FUNCTION
+
 export async function deleteTranscript(id: string) {
     try {
         await prisma.transcript.delete({
@@ -22,7 +22,7 @@ export async function deleteTranscript(id: string) {
     }
 }
 
-// 2. EDIT FUNCTION
+
 export async function updateTranscript(id: string, newContent: string) {
     try {
         await prisma.transcript.update({
@@ -37,9 +37,9 @@ export async function updateTranscript(id: string, newContent: string) {
     }
 }
 
-// 3. UPLOAD & TRANSCRIBE FUNCTION (Gemini Powered)
+
 export async function processAudioUpload(formData: FormData) {
-    // 1. Get the session to find the Admin's ID
+    
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -64,12 +64,12 @@ export async function processAudioUpload(formData: FormData) {
 
         const realTranscription = result.response.text();
 
-        // 2. CONNECT TO THE USER
+        
         await prisma.transcript.create({
             data: {
                 content: realTranscription,
                 user: {
-                    connect: { id: session.user.id } // 👈 This fixes the missing argument error
+                    connect: { id: session.user.id } 
                 }
             }
         });
@@ -80,7 +80,7 @@ export async function processAudioUpload(formData: FormData) {
     } catch (error: any) {
     console.error("AI Transcription Error:", error);
     
-    // Check if it's a quota error
+    
     if (error.message?.includes("429") || error.status === 429) {
         return { 
             success: false, 

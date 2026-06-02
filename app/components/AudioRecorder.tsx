@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-// 1. Point this to the action we just fixed with Gemini 3
+
 import { processAudioUpload } from "@/app/actions/transcript-actions"; 
 
 interface Props {
@@ -34,23 +34,23 @@ export default function AudioRecorder({ isProcessing, setIsProcessing }: Props) 
       };
 
       mediaRecorder.onstop = async () => {
-        setIsProcessing(true); // Locks the whole UI
+        setIsProcessing(true); 
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const file = new File([audioBlob], "recording.webm", { type: "audio/webm" });
 
         const formData = new FormData();
-        // 2. Changed "audio" to "file" to match your server-side .get("file")
+        
         formData.append("file", file); 
 
         const response = await processAudioUpload(formData);
         
         if (response.success) {
-          // The log will now appear in your "Recent Logs" list automatically!
+          
           setTranscript("Voice log saved to dashboard.");
         } else {
           setErrorMessage(response.error || "The AI failed to process the audio.");
         }
-        setIsProcessing(false); // Unlocks the UI
+        setIsProcessing(false); 
       };
 
       mediaRecorder.start();

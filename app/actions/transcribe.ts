@@ -13,7 +13,7 @@ export async function transcribeAudio(formData: FormData) {
 
     const prompt = "You are a professional transcriptionist. Please transcribe this audio accurately. Only return the transcription text, nothing else. If it is silent, say '[No speech detected]'.";
 
-    // 1. Get the text from Gemini
+    
     const result = await aiModel.generateContent([
       prompt,
       {
@@ -23,7 +23,7 @@ export async function transcribeAudio(formData: FormData) {
 
     const finalTranscript = result.response.text();
 
-    // 2. SAVE IT TO THE DATABASE!
+    
    const adminUser = await prisma.user.findFirst();
 
     if (!adminUser) {
@@ -39,7 +39,7 @@ export async function transcribeAudio(formData: FormData) {
       },
     });
     revalidatePath("/dashboard");
-    // 3. Return it to the frontend
+    
     return { success: true, text: finalTranscript };
 
   } catch (error) {

@@ -16,7 +16,7 @@ export default function TranscriptCard({ log }: TranscriptProps) {
     const [content, setContent] = useState(log.content);
     const [isPending, setIsPending] = useState(false);
     
-    // 1. NEW STATE: Controls the visibility of the custom delete modal
+    
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const handleSave = async () => {
@@ -26,10 +26,10 @@ export default function TranscriptCard({ log }: TranscriptProps) {
         setIsPending(false);
     };
 
-    // 2. NEW FUNCTION: Actually executes the deletion
+    
     const executeDelete = async () => {
         setIsPending(true);
-        setShowDeleteModal(false); // Hide the modal immediately
+        setShowDeleteModal(false); 
         await deleteTranscript(log.id);
     };
 
@@ -37,7 +37,7 @@ export default function TranscriptCard({ log }: TranscriptProps) {
         <>
             <div className="p-7 bg-[#141414] border border-white/5 rounded-2xl shadow-xl hover:bg-[#181818] hover:border-white/10 transition-all duration-500 group relative">
                 
-                {/* The Edit / Delete Controls */}
+                {}
                 <div className="absolute top-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <button 
                         onClick={() => setIsEditing(!isEditing)}
@@ -47,7 +47,7 @@ export default function TranscriptCard({ log }: TranscriptProps) {
                         {isEditing ? "Cancel" : "Edit"}
                     </button>
                     <button 
-                        // 3. Trigger the custom modal instead of window.confirm
+                        
                         onClick={() => setShowDeleteModal(true)}
                         className="text-xs text-red-500/70 hover:text-red-500 uppercase tracking-wider font-semibold transition-colors"
                         disabled={isPending}
@@ -56,7 +56,7 @@ export default function TranscriptCard({ log }: TranscriptProps) {
                     </button>
                 </div>
 
-                {/* The Content Area */}
+                {}
                 {isEditing ? (
                     <div className="mt-4">
                         <textarea 
@@ -78,7 +78,7 @@ export default function TranscriptCard({ log }: TranscriptProps) {
                     </p>
                 )}
                 
-                {/* Elegant timestamp footer */}
+                {}
                 <div className="flex items-center gap-3 mt-5 opacity-40">
                     <div className="h-1 w-1 rounded-full bg-[#D4AF37]"></div>
                     <p className="text-[11px] text-gray-400 font-mono tracking-widest uppercase">
@@ -87,7 +87,7 @@ export default function TranscriptCard({ log }: TranscriptProps) {
                 </div>
             </div>
 
-            {/* 4. THE CUSTOM DELETION MODAL */}
+            {}
             {showDeleteModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300">
                     <div className="bg-[#141414] border border-white/10 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-[0_0_50px_rgba(0,0,0,0.8)] transform transition-all">

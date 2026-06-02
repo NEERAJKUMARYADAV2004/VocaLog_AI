@@ -26,7 +26,7 @@ export default function SignupPage() {
             email: email,
             password: password,
             name: name,
-            callbackURL: "/dashboard" // Redirect after success
+            callbackURL: "/dashboard" 
         });
         
         if (error) {
