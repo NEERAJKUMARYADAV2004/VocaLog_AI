@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
         // If authenticated and on an auth route, redirect to /dashboard
         if (isAuthRoute && isAuthenticated) {
             // Check to ensure we aren't already going to /dashboard to prevent loop
-            if (pathname !== "/dashboard") {
+            if ((pathname as string) !== "/dashboard") {
                 return NextResponse.redirect(new URL("/dashboard", request.url));
             }
         }
