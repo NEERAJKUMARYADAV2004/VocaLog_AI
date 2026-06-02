@@ -4,16 +4,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Live Application
 
-The application is deployed on Vercel and uses a Neon Postgres database (no Railway). You can access the live login page here:
+The application is deployed on Vercel and uses a Neon Postgres database (no Railway). You can access the live application here:
 
-[**https://voca-log-ai.vercel.app/login**](https://voca-log-ai.vercel.app/login)
+[**https://voca-log-ai.vercel.app/**](https://voca-log-ai.vercel.app/)
 
-### Access Credentials
+### Global Authentication & Routing
 
-Use the following credentials to log in:
-- **Email:** `test@example.com`  *(Please update this if you have a specific test account)*
-- **Password:** `password123` *(Please update this if you have a specific test account)*
-
+VocaLog AI features a robust **Next.js Edge Middleware** guard protecting the entire application:
+- **Root-Level Auth Boundary**: Unauthenticated visitors attempting to access internal routes are instantly redirected to the root `/` page.
+- **Secure Registration**: Users can create their own accounts using the built-in signup flow (no database seeding required).
+- **Session Protections**: The edge middleware securely validates sessions via `better-auth` before letting traffic through to the dashboard.
 ## Getting Started
 
 First, run the development server:
