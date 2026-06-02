@@ -9,4 +9,10 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    trustedOrigins: [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://voca-log-ai.vercel.app",
+        process.env.NEXT_PUBLIC_APP_URL as string,
+    ].filter(Boolean),
 });
