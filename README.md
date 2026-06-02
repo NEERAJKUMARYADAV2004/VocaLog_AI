@@ -1,4 +1,18 @@
+# VocaLog AI
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Live Application
+
+The application is deployed on Vercel and uses a Neon Postgres database (no Railway). You can access the live login page here:
+
+[**https://voca-log-ai.vercel.app/login**](https://voca-log-ai.vercel.app/login)
+
+### Access Credentials
+
+Use the following credentials to log in:
+- **Email:** `test@example.com`  *(Please update this if you have a specific test account)*
+- **Password:** `password123` *(Please update this if you have a specific test account)*
 
 ## Getting Started
 
@@ -15,10 +29,6 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
 
