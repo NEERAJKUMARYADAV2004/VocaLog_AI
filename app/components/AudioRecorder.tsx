@@ -16,6 +16,7 @@ export default function AudioRecorder({ isProcessing, setIsProcessing }: Props) 
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const recordingStartTimeRef = useRef<number>(0);
 
   const startRecording = async () => {
     setErrorMessage(null);
@@ -34,6 +35,15 @@ export default function AudioRecorder({ isProcessing, setIsProcessing }: Props) 
       };
 
       mediaRecorder.onstop = async () => {
+        const recordingDuration = Date.now() - recordingStartTimeRef.current;
+        
+        // Don't process recordings shorter than 1.5 seconds
+        if (recordingDuration < 1500) {
+          setErrorMessage("Recording too short. Please speak for at least 2 seconds.");
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+
         setIsProcessing(true); 
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const file = new File([audioBlob], "recording.webm", { type: "audio/webm" });
@@ -54,6 +64,7 @@ export default function AudioRecorder({ isProcessing, setIsProcessing }: Props) 
       };
 
       mediaRecorder.start();
+      recordingStartTimeRef.current = Date.now();
       setIsRecording(true);
     } catch (error) {
       console.error("Error accessing microphone:", error);

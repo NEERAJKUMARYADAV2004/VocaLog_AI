@@ -1,24 +1,19 @@
 import { prisma } from "../../lib/prisma"; 
 import LogoutButton from "../components/LogoutButton";
 
-
-import { auth } from "@/lib/auth"; 
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import TranscriptCard from "../components/TranscriptCard";
-
 import TranscriptionManager from "../components/TranscriptionManager"; 
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   
-  const session = await auth.api.getSession({
-    headers: await headers(), 
-  });
+  const cookieStore = await cookies();
+  const session = cookieStore.get("vocalog_session");
 
-  
   if (!session) {
     redirect("/login");
   }

@@ -3,8 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { auth } from "@/lib/auth"; 
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -39,10 +38,8 @@ export async function updateTranscript(id: string, newContent: string) {
 
 
 export async function processAudioUpload(formData: FormData) {
-    
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+    const cookieStore = await cookies();
+    const session = cookieStore.get("vocalog_session");
 
     if (!session) return { success: false, error: "Authentication required" };
 
@@ -52,25 +49,30 @@ export async function processAudioUpload(formData: FormData) {
     try {
         const arrayBuffer = await file.arrayBuffer();
         const base64Data = Buffer.from(arrayBuffer).toString("base64");
-        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro-latest" });
 
         const result = await model.generateContent([
             { inlineData: { mimeType: file.type, data: base64Data } },
             { text: `ACT AS A RAW TRANSCRIPTION ENGINE. 
         Transcribe the audio exactly as spoken. 
         DO NOT include any introductory remarks, preambles, or conversational filler like "Sure, here is the transcription". 
-        Output ONLY the spoken words. If there is no speech, return an empty string.` },
+        Output ONLY the spoken words. If there is no speech, silence, background noise, or unintelligible audio, respond with EXACTLY: [NO_SPEECH]` },
         ]);
 
-        const realTranscription = result.response.text();
+        const realTranscription = result.response.text().trim();
 
-        
+        // Don't save empty or silent transcriptions
+        if (!realTranscription || 
+            realTranscription === "[NO_SPEECH]" || 
+            realTranscription === "[No speech detected]" ||
+            realTranscription.toLowerCase().includes("no speech") ||
+            realTranscription.length < 3) {
+            return { success: false, error: "No speech detected in the audio." };
+        }
+
         await prisma.transcript.create({
             data: {
-                content: realTranscription,
-                user: {
-                    connect: { id: session.user.id } 
-                }
+                content: realTranscription
             }
         });
 

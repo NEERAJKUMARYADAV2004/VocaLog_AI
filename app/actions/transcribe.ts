@@ -11,7 +11,7 @@ export async function transcribeAudio(formData: FormData) {
     const arrayBuffer = await file.arrayBuffer();
     const base64Audio = Buffer.from(arrayBuffer).toString("base64");
 
-    const prompt = "You are a professional transcriptionist. Please transcribe this audio accurately. Only return the transcription text, nothing else. If it is silent, say '[No speech detected]'.";
+    const prompt = "You are a professional transcriptionist. Please transcribe this audio accurately. Only return the transcription text, nothing else. If the audio is silent, has no speech, or only background noise, respond with EXACTLY: [NO_SPEECH]";
 
     
     const result = await aiModel.generateContent([
@@ -21,21 +21,20 @@ export async function transcribeAudio(formData: FormData) {
       },
     ]);
 
-    const finalTranscript = result.response.text();
+    const finalTranscript = result.response.text().trim();
 
-    
-   const adminUser = await prisma.user.findFirst();
-
-    if (!adminUser) {
-      return { success: false, error: "No admin user found in database." };
+    // Don't save empty or silent transcriptions
+    if (!finalTranscript || 
+        finalTranscript === "[NO_SPEECH]" || 
+        finalTranscript === "[No speech detected]" ||
+        finalTranscript.toLowerCase().includes("no speech") ||
+        finalTranscript.length < 3) {
+      return { success: false, error: "No speech detected in the audio." };
     }
 
     await prisma.transcript.create({
       data: {
-        content: finalTranscript,
-        user: {
-          connect: { id: adminUser.id }
-        }
+        content: finalTranscript
       },
     });
     revalidatePath("/dashboard");

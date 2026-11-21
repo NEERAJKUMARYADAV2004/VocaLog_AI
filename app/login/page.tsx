@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "../../lib/auth-client"; 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { loginAction } from "../actions/auth-actions";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -16,14 +15,14 @@ export default function LoginPage() {
         setErrorMessage("");
         setIsLoading(true);
 
-        const { error } = await authClient.signIn.email({
-            email: email,
-            password: password,
-            callbackURL: "/dashboard" 
-        });
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", password);
+
+        const result = await loginAction(formData);
         
-        if (error) {
-            setErrorMessage(error.message || "Unauthorized access.");
+        if (!result.success) {
+            setErrorMessage(result.error || "Unauthorized access.");
             setIsLoading(false);
         } else {
             router.push("/dashboard");
@@ -37,22 +36,24 @@ export default function LoginPage() {
 
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-bold text-white">VocaLog AI</h1>
-                    <p className="text-[#D4AF37]/60 mt-3 text-xs tracking-widest uppercase">Welcome Back</p>
+                    <p className="text-[#D4AF37]/60 mt-3 text-xs tracking-widest uppercase">Admin Login</p>
                 </div>
                 
                 <div className="space-y-5">
                     {errorMessage && <p className="text-red-400 text-sm text-center">{errorMessage}</p>}
                     <input 
                         type="email" 
-                        placeholder="Email Address"
+                        placeholder="Admin Email"
                         className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl p-4 text-white focus:border-[#D4AF37]/50 focus:outline-none transition-all"
                         onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
                     />
                     <input 
                         type="password" 
                         placeholder="Password"
                         className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl p-4 text-white focus:border-[#D4AF37]/50 focus:outline-none transition-all"
                         onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
                     />
                     <button 
                         onClick={handleAuth}
@@ -61,9 +62,6 @@ export default function LoginPage() {
                     >
                         {isLoading ? "Verifying..." : "Log In"}
                     </button>
-                    <div className="text-center mt-4 text-sm text-[#E0E0E0]/60">
-                        Don't have an account? <Link href="/signup" className="text-[#D4AF37] hover:underline">Sign up</Link>
-                    </div>
                 </div>
             </div>
         </div>
