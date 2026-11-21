@@ -8,12 +8,13 @@ The application is deployed on Vercel and uses a Neon Postgres database (no Rail
 
 [**https://voca-log-ai.vercel.app/**](https://voca-log-ai.vercel.app/)
 
-### Global Authentication & Routing
+### Authentication & Credentials
 
-VocaLog AI features a robust **Next.js Edge Middleware** guard protecting the entire application:
-- **Root-Level Auth Boundary**: Unauthenticated visitors attempting to access internal routes are instantly redirected to the root `/` page.
-- **Secure Registration**: Users can create their own accounts using the built-in signup flow (no database seeding required).
-- **Session Protections**: The edge middleware securely validates sessions via `better-auth` before letting traffic through to the dashboard.
+The application uses an administrative authentication gate:
+- **Email:** `admin@vocalog.com`
+- **Password:** `vocalog2026`
+
+Unauthenticated visitors attempting to access protected routes are redirected to `/login`.
 ## Getting Started
 
 First, run the development server:
